@@ -98,12 +98,7 @@
 	      <version>${hibernate.version}</version>
 	    </dependency>
 	
-	    <!-- Hibernate Validator (optional) -->
-	    <dependency>
-	      <groupId>org.hibernate.validator</groupId>
-	      <artifactId>hibernate-validator</artifactId>
-	      <version>9.1.0.Final</version>
-	    </dependency>
+	    
 	
 	    <!-- Lombok -->
 	    <dependency>
@@ -112,6 +107,13 @@
 	      <version>${lombok.version}</version>
 	      <scope>provided</scope>
 	    </dependency>
+	    
+	    <dependency>
+			<groupId>org.sitemesh</groupId>
+			<artifactId>sitemesh</artifactId>
+			<version>3.2.1</version>
+		</dependency>
+		
 	</dependencies>
   <build>
         <pluginManagement>
