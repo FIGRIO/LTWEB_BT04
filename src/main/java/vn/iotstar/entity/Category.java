@@ -1,11 +1,13 @@
 package vn.iotstar.entity;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Categories")
+@Table(name = "Category")
+@NamedQuery(name = "Category.findAll", query = "SELECT c FROM Category c")
 public class Category implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -15,75 +17,65 @@ public class Category implements Serializable {
     @Column(name = "CategoryId")
     private int categoryId;
 
-    @Column(name = "Categoryname", columnDefinition = "nvarchar(200) NOT NULL")
-    private String categoryName;
+    @Column(name = "Categoryname", length = 100, nullable = false)
+    private String categoryname;
 
-    @Column(name = "Categorycode", columnDefinition = "nvarchar(50) NOT NULL")
-    private String categoryCode; // <-- Cần thêm cái này
+    @Column(name = "Categorycode", length = 50)
+    private String categorycode;
 
-    @Column(name = "Images", columnDefinition = "nvarchar(500)")
-    private String images;       // <-- Cần thêm cái này
+    @Column(name = "Images", length = 255)
+    private String images;
 
     @Column(name = "Status")
-    private int status;          // <-- Cần thêm cái này (thường là 0: ẩn, 1: hiện)
+    private int status;
 
-    // --- Quan hệ 1-N: Một Category có nhiều Video (Yêu cầu số 3) ---
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    // --- QUAN HỆ MỚI: Category N - 1 User ---
+    // Category này thuộc sự quản lý của User nào.
+    // Tạo cột khóa ngoại "ManagerUsername" trong bảng Category.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ManagerUsername")
+    private User manager;
+
+    // --- QUAN HỆ CŨ: Category 1 - N Video ---
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Video> videos;
 
-    // Constructor rỗng
-    public Category() { }
+    public Category() {
+        this.videos = new ArrayList<>();
+    }
 
-	public int getCategoryId() {
-		return categoryId;
-	}
+    // --- Getters and Setters cơ bản ---
+    public int getCategoryId() { return categoryId; }
+    public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
+    public String getCategoryname() { return categoryname; }
+    public void setCategoryname(String categoryname) { this.categoryname = categoryname; }
+    public String getCategorycode() { return categorycode; }
+    public void setCategorycode(String categorycode) { this.categorycode = categorycode; }
+    public String getImages() { return images; }
+    public void setImages(String images) { this.images = images; }
+    public int getStatus() { return status; }
+    public void setStatus(int status) { this.status = status; }
 
-	public void setCategoryId(int categoryId) {
-		this.categoryId = categoryId;
-	}
+    // --- Getters/Setters cho các quan hệ ---
 
-	public String getCategoryName() {
-		return categoryName;
-	}
+    // User Manager
+    public User getManager() { return manager; }
+    public void setManager(User manager) { this.manager = manager; }
 
-	public void setCategoryName(String categoryName) {
-		this.categoryName = categoryName;
-	}
+    // List Videos
+    public List<Video> getVideos() { return videos; }
+    public void setVideos(List<Video> videos) { this.videos = videos; }
 
-	public String getCategoryCode() {
-		return categoryCode;
-	}
+    // Helper methods cho Video
+    public Video addVideo(Video video) {
+        getVideos().add(video);
+        video.setCategory(this);
+        return video;
+    }
 
-	public void setCategoryCode(String categoryCode) {
-		this.categoryCode = categoryCode;
-	}
-
-	public String getImages() {
-		return images;
-	}
-
-	public void setImages(String images) {
-		this.images = images;
-	}
-
-	public int getStatus() {
-		return status;
-	}
-
-	public void setStatus(int status) {
-		this.status = status;
-	}
-
-	public List<Video> getVideos() {
-		return videos;
-	}
-
-	public void setVideos(List<Video> videos) {
-		this.videos = videos;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
+    public Video removeVideo(Video video) {
+        getVideos().remove(video);
+        video.setCategory(null);
+        return video;
+    }
 }
